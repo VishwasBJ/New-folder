@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arogya - Healthcare for All</title>
+    
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_API_KEY&libraries=places"></script>
+    <style>:root {
+        --primary-color: #4EB1A6;
+        --primary-dark: #3A8A80;
+        --secondary-color: #ffffff;
+        --accent-color: #E8F8F6;
+        --text-color: #2C3E50;
+        --background-color: #ffffff;
+        --danger-color: #f44336;
+        --success-color: #4CAF50;
+    }
+    
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+    
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: var(--background-color);
+        color: var(--text-color);
+        position: relative;
+        min-height: 100vh;
+    }
+    
+    /* Header Styles */
+    header {
+        background-color: white;
+        padding: 1rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+    }
+    
+    .logo h1 {
+        color: var(--primary-color);
+        font-size: 1.5rem;
+    }
+    
+    .top-nav {
+        display: flex;
+        gap: 1rem;
+    }
+    
+    .nav-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        cursor: pointer;
+        padding: 0.5rem;
+    }
+    
+    .nav-item.active {
+        color: var(--primary-color);
+    }
+    
+    .location-selector {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .search-bar {
+        display: flex;
+        align-items: center;
+        background-color: #f5f5f5;
+        padding: 0.5rem;
+        border-radius: 24px;
+        flex-grow: 1;
+        margin-left: 1rem;
+    }
+    
+    .search-bar input {
+        flex: 1;
+        border: none;
+        background: none;
+        padding: 0.5rem;
+        outline: none;
+    }
+    
+    /* Services Grid */
+    .services-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 1rem;
+        padding: 1rem;
+    }
+    
+    .service-card {
+        background-color: var(--accent-color);
+        padding: 1.5rem;
+        border-radius: 12px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 6px rgba(78, 177, 166, 0.1);
+    }
+    
+    .service-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 6px 12px rgba(78, 177, 166, 0.2);
+    }
+    
+    .service-card i {
+        color: var(--primary-color);
+        font-size: 2rem;
+        margin-bottom: 1rem;
+    }
+    
+    /* Specialties Section */
+    .specialties-section {
+        padding: 2rem;
+    }
+    
+    .specialty-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+    
+    .specialty-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+    
+    .specialty-item img {
+        width: 100px;
+        height: 100px;
+        object-fit: cover;
+        border-radius: 50%;
+        margin-bottom: 0.5rem;
+    }
+    
+    /* SOS Button */
+    .sos-button {
+        position: fixed;
+        top: 50%;
+        right: 0;
+        transform: translateY(-50%);
+        background-color: var(--danger-color);
+        color: white;
+        border: none;
+        padding: 1rem;
+        border-radius: 8px 0 0 8px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        z-index: 1000;
+    }
+    
+    /* Chatbot */
+    .chatbot-button {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background-color: var(--primary-color);
+        color: white;
+        border: none;
+        width: 56px;
+        height: 56px;
+        border-radius: 50%;
+        cursor: pointer;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        z-index: 1000;
+    }
+    
+    .chatbot-dialog {
+        position: fixed;
+        bottom: 80px;
+        right: 20px;
+        width: 300px;
+        height: 400px;
+        background-color: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        display: flex;
+        flex-direction: column;
+        z-index: 1000;
+    }
+    
+    .chatbot-dialog.hidden {
+        display: none;
+    }
+    
+    /* Page Transitions */
+    .page {
+        display: none;
+        padding: 1rem;
+        animation: fadeIn 0.3s ease-in-out;
+    }
+    
+    .page.active {
+        display: block;
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+    
+    /* Hero Section */
+    .hero-section {
+        background-color: var(--primary-color);
+        color: var(--secondary-color);
+        padding: 4rem 2rem;
+        text-align: center;
+        position: relative;
+    }
+    
+    .hero-section h2 {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .hero-section p {
+        font-size: 1.2rem;
+        opacity: 0.9;
+    }
+    
+    /* Insurance Section */
+    .insurance-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        padding: 1rem;
+    }
+    
+    .insurance-card {
+        background-color: var(--accent-color);
+        padding: 1.5rem;
+        border-radius: 12px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .insurance-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 6px 12px rgba(78, 177, 166, 0.2);
+    }
+    
+    #insurance-form {
+        max-width: 500px;
+        margin: 2rem auto;
+        padding: 2rem;
+        background-color: var(--accent-color);
+        border-radius: 12px;
+    }
+    
+    #insurance-form input {
+        width: 100%;
+        padding: 0.5rem;
+        margin-bottom: 1rem;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
+    
+    #insurance-form button {
+        background-color: var(--primary-color);
+        color: white;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+    
+    /* Government Schemes */
+    .scheme-list {
+        list-style-type: none;
+        padding: 1rem;
+    }
+    
+    .scheme-list li {
+        margin-bottom: 1rem;
+    }
+    
+    .scheme-list a {
+        color: var(--primary-color);
+        text-decoration: none;
+    }
+    
+    .scheme-list a:hover {
+        text-decoration: underline;
+    }
+    
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        header {
+            flex-direction: column;
+        }
+    
+        .search-bar {
+            margin-left: 0;
+            margin-top: 1rem;
+        }
+    
+        .services-grid,
+        .insurance-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+    
+    @media (max-width: 480px) {
+        .services-grid,
+        .insurance-grid,
+        .specialty-grid {
+            grid-template-columns: 1fr;
+        }
+    }</style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="logo">
+            <h1>Arogya</h1>
+        </div>
+        <!-- Navigation Bar (moved here) -->
+        <nav class="top-nav">
+            <div class="nav-item active" onclick="changePage('home')">
+                <i class="material-icons">home</i>
+                <span>Home</span>
+            </div>
+            <div class="nav-item" onclick="changePage('appointments')">
+                <i class="material-icons">event</i>
+                <span>Appointments</span>
+            </div>
+            <div class="nav-item" onclick="changePage('records')">
+                <i class="material-icons">folder</i>
+                <span>Records</span>
+            </div>
+            <div class="nav-item" onclick="changePage('profile')">
+                <i class="material-icons">person</i>
+                <span>Profile</span>
+            </div>
+        </nav>
+        <div class="location-selector">
+            <i class="material-icons">location_on</i>
+            <select id="location">
+                <option value="bangalore">Bangalore</option>
+                <option value="mumbai">Mumbai</option>
+                <option value="mysore">Mysore</option>
+            </select>
+        </div>
+        <div class="search-bar">
+            <input type="text" placeholder="Search for doctors, clinics, treatments...">
+            <i class="material-icons">search</i>
+        </div>
+    </header>
+
+    <!-- Emergency SOS Button -->
+    <button id="sos-button" class="sos-button">
+        <i class="material-icons">emergency</i>
+        SOS Emergency
+    </button>
+
+    <!-- Main Content -->
+    <main id="main-content">
+        <!-- Home Section -->
+        <section id="home" class="page active">
+            <div class="hero-section">
+                <h2>Healthcare at Your Fingertips</h2>
+                <p>Connecting Rural Communities with Quality Healthcare</p>
+            </div>
+
+            <div class="services-grid">
+                <div class="service-card" onclick="changePage('video-call')">
+                    <i class="material-icons">videocam</i>
+                    <h3>Video Consultation</h3>
+                    <p>Connect with doctors instantly</p>
+                </div>
+                <div class="service-card" onclick="changePage('chat')">
+                    <i class="material-icons">chat</i>
+                    <h3>Chat with Doctor</h3>
+                    <p>24/7 medical assistance</p>
+                </div>
+                <div class="service-card" onclick="showNearestClinics()">
+                    <i class="material-icons">local_hospital</i>
+                    <h3>Find Nearby Clinic</h3>
+                    <p>Locate healthcare centers</p>
+                </div>
+                <div class="service-card" onclick="changePage('insurance')">
+                    <i class="material-icons">health_and_safety</i>
+                    <h3>Insurance</h3>
+                    <p>Health coverage plans</p>
+                </div>
+                <div class="service-card" onclick="changePage('schemes')">
+                    <i class="material-icons">card_giftcard</i>
+                    <h3>Government Schemes</h3>
+                    <p>Healthcare benefits</p>
+                </div>
+                <div class="service-card" onclick="changePage('pharmacy')">
+                    <i class="material-icons">local_pharmacy</i>
+                    <h3>Medical Stores</h3>
+                    <p>Find medicines nearby</p>
+                </div>
+            </div>
+
+            <div class="specialties-section">
+                <h2>Find Specialists</h2>
+                <div class="specialty-grid">
+                    <div class="specialty-item">
+                        <img src="/placeholder.svg?height=100&width=100" alt="General Physician">
+                        <span>General Physician</span>
+                    </div>
+                    <div class="specialty-item">
+                        <img src="/placeholder.svg?height=100&width=100" alt="Skin & Hair">
+                        <span>Skin & Hair</span>
+                    </div>
+                    <div class="specialty-item">
+                        <img src="/placeholder.svg?height=100&width=100" alt="Women's Health">
+                        <span>Women's Health</span>
+                    </div>
+                    <div class="specialty-item">
+                        <img src="/placeholder.svg?height=100&width=100" alt="Dental Care">
+                        <span>Dental Care</span>
+                    </div>
+                    <div class="specialty-item">
+                        <img src="/placeholder.svg?height=100&width=100" alt="Cardiology">
+                        <span>Cardiology</span>
+                    </div>
+                    <div class="specialty-item">
+                        <img src="/placeholder.svg?height=100&width=100" alt="Orthopedics">
+                        <span>Orthopedics</span>
+                    </div>
+                    <div class="specialty-item">
+                        <img src="/placeholder.svg?height=100&width=100" alt="Pediatrics">
+                        <span>Pediatrics</span>
+                    </div>
+                    <div class="specialty-item">
+                        <img src="/placeholder.svg?height=100&width=100" alt="Neurology">
+                        <span>Neurology</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Other Sections (Initially Hidden) -->
+        <section id="video-call" class="page">
+            <h2>Video Consultation</h2>
+            <div class="doctor-list">
+                <!-- Doctor cards will be populated by JavaScript -->
+            </div>
+        </section>
+
+        <section id="chat" class="page">
+            <h2>Chat with Doctors</h2>
+            <div class="chat-container">
+                <!-- Chat interface will be populated by JavaScript -->
+            </div>
+        </section>
+
+        <section id="clinics" class="page">
+            <h2>Nearby Clinics</h2>
+            <div id="map" style="height: 400px; width: 100%;"></div>
+            <div id="clinic-list"></div>
+        </section>
+
+        <section id="insurance" class="page">
+            <h2>Insurance Plans</h2>
+            <div class="insurance-grid">
+                <div class="insurance-card" onclick="showInsuranceForm('Life Insurance')">
+                    <h3>Life Insurance</h3>
+                    <p>Protect your family's future</p>
+                </div>
+                <div class="insurance-card" onclick="showInsuranceForm('Health Insurance')">
+                    <h3>Health Insurance</h3>
+                    <p>Comprehensive health coverage</p>
+                </div>
+                <div class="insurance-card" onclick="showInsuranceForm('Medical Insurance')">
+                    <h3>Medical Insurance</h3>
+                    <p>Coverage for medical expenses</p>
+                </div>
+                <div class="insurance-card" onclick="showInsuranceForm('Accident Insurance')">
+                    <h3>Accident Insurance</h3>
+                    <p>Protection against accidents</p>
+                </div>
+                <div class="insurance-card" onclick="showInsuranceForm('Critical Illness Insurance')">
+                    <h3>Critical Illness Insurance</h3>
+                    <p>Coverage for serious illnesses</p>
+                </div>
+            </div>
+            <div id="insurance-form" class="hidden">
+                <h3 id="insurance-form-title"></h3>
+                <form id="insurance-application-form">
+                    <input type="text" name="name" placeholder="Full Name" required>
+                    <input type="text" name="address" placeholder="Address" required>
+                    <input type="tel" name="phone" placeholder="Phone Number" required>
+                    <input type="text" name="aadhar" placeholder="Aadhar Card Number" required>
+                    <input type="text" name="father" placeholder="Father's Name" required>
+                    <input type="text" name="mother" placeholder="Mother's Name" required>
+                    <input type="email" name="email" placeholder="Email Address" required>
+                    <button type="submit">Apply</button>
+                </form>
+            </div>
+        </section>
+
+        <section id="schemes" class="page">
+            <h2>Government Healthcare Schemes</h2>
+            <ul class="scheme-list">
+                <li><a href="https://www.pmjay.gov.in/" target="_blank">Ayushman Bharat Pradhan Mantri Jan Arogya Yojana (AB-PMJAY)</a></li>
+                <li><a href="https://www.nhp.gov.in/national-health-mission_pg" target="_blank">National Health Mission (NHM)</a></li>
+                <li><a href="https://www.nhp.gov.in/national-aids-control-organisation_pg" target="_blank">National AIDS Control Programme (NACP)</a></li>
+                <li><a href="https://www.nhp.gov.in/national-mental-health-program_pg" target="_blank">National Mental Health Programme (NMHP)</a></li>
+                <li><a href="https://www.nhp.gov.in/national-programme-for-prevention-and-control-of-cancer-diabetes-cardiovascular-diseases-and-stroke_pg" target="_blank">National Programme for Prevention and Control of Cancer, Diabetes, Cardiovascular Diseases and Stroke (NPCDCS)</a></li>
+            </ul>
+        </section>
+    </main>
+
+    <!-- Chatbot Button -->
+    <button id="chatbot-button" class="chatbot-button">
+        <i class="material-icons">support_agent</i>
+    </button>
+
+    <!-- Chatbot Dialog -->
+    <div id="chatbot-dialog" class="chatbot-dialog hidden">
+        <div class="chatbot-header">
+            <h3>Healthcare Assistant</h3>
+            <button onclick="toggleChatbot()">
+                <i class="material-icons">close</i>
+            </button>
+        </div>
+        <div class="chatbot-messages">
+            <!-- Messages will be populated by JavaScript -->
+        </div>
+        <div class="chatbot-input">
+            <input type="text" placeholder="Type your question...">
+            <button><i class="material-icons">send</i></button>
+        </div>
+    </div>
+
+    <script>// RapidAPI Configuration
+        const rapidApiHeaders = {
+            'x-rapidapi-key': '18cba466bemsh05889b43b444132p1faac9jsn61bb856eb865',
+            'x-rapidapi-host': 'google-api31.p.rapidapi.com'
+          };
+          
+          // Page Navigation
+          function changePage(pageId) {
+              // Hide all pages
+              document.querySelectorAll('.page').forEach(page => {
+                  page.classList.remove('active');
+              });
+          
+              // Show selected page
+              document.getElementById(pageId).classList.add('active');
+          
+              // Update navigation
+              document.querySelectorAll('.nav-item').forEach(item => {
+                  item.classList.remove('active');
+              });
+              document.querySelector(`.nav-item[onclick="changePage('${pageId}')"]`)?.classList.add('active');
+          
+              // Update URL without page reload
+              history.pushState(null, '', `#${pageId}`);
+          }
+          
+          // Chatbot Toggle
+          function toggleChatbot() {
+              const dialog = document.getElementById('chatbot-dialog');
+              dialog.classList.toggle('hidden');
+          }
+          
+          // SOS Button
+          document.getElementById('sos-button').addEventListener('click', function() {
+              // In a real application, this would trigger emergency services
+              alert('Emergency services have been notified. Help is on the way.');
+          });
+          
+          // Chatbot Button
+          document.getElementById('chatbot-button').addEventListener('click', toggleChatbot);
+          
+          // Handle Browser Back/Forward
+          window.addEventListener('popstate', function() {
+              const pageId = location.hash.slice(1) || 'home';
+              changePage(pageId);
+          });
+          
+          // Initialize page based on URL hash
+          document.addEventListener('DOMContentLoaded', function() {
+              const pageId = location.hash.slice(1) || 'home';
+              changePage(pageId);
+          });
+          
+          // Location Selector
+          document.getElementById('location').addEventListener('change', function(e) {
+              // In a real application, this would update content based on location
+              console.log('Location changed to:', e.target.value);
+          });
+          
+          // Example function to add a chatbot message
+          function addChatbotMessage(message, isUser = false) {
+              const messagesContainer = document.querySelector('.chatbot-messages');
+              const messageElement = document.createElement('div');
+              messageElement.classList.add('message');
+              messageElement.classList.add(isUser ? 'user-message' : 'bot-message');
+              messageElement.textContent = message;
+              messagesContainer.appendChild(messageElement);
+              messagesContainer.scrollTop = messagesContainer.scrollHeight;
+          }
+          
+          // Initialize chatbot with welcome message
+          addChatbotMessage('Hello! How can I help you today?');
+          
+          // Handle chatbot input
+          document.querySelector('.chatbot-input button').addEventListener('click', function() {
+              const input = document.querySelector('.chatbot-input input');
+              const message = input.value.trim();
+              
+              if (message) {
+                  addChatbotMessage(message, true);
+                  input.value = '';
+                  
+                  // Simulate bot response
+                  setTimeout(() => {
+                      addChatbotMessage('Thank you for your message. A healthcare assistant will respond shortly.');
+                  }, 1000);
+              }
+          });
+          
+          // Update the map initialization to use RapidAPI
+          function initMap() {
+              const bangalore = { lat: 12.9716, lng: 77.5946 };
+              
+              fetch('https://google-api31.p.rapidapi.com/maps/api/js', {
+                  method: 'GET',
+                  headers: rapidApiHeaders
+              })
+              .then(response => response.json())
+              .then(data => {
+                  map = new google.maps.Map(document.getElementById('map'), {
+                      center: bangalore,
+                      zoom: 15
+                  });
+                  infowindow = new google.maps.InfoWindow();
+              })
+              .catch(err => {
+                  console.error('Error initializing map:', err);
+              });
+          }
+          
+          // Update the showNearestClinics function to use RapidAPI
+          function showNearestClinics() {
+              changePage('clinics');
+              if (navigator.geolocation) {
+                  navigator.geolocation.getCurrentPosition(position => {
+                      const userLocation = {
+                          lat: position.coords.latitude,
+                          lng: position.coords.longitude
+                      };
+                      
+                      fetch('https://google-api31.p.rapidapi.com/maps/api/place/nearbysearch/json', {
+                          method: 'POST',
+                          headers: {
+                              ...rapidApiHeaders,
+                              'Content-Type': 'application/json'
+                          },
+                          body: JSON.stringify({
+                              location: userLocation,
+                              radius: 5000,
+                              type: 'hospital'
+                          })
+                      })
+                      .then(response => response.json())
+                      .then(data => {
+                          if (data.results) {
+                              data.results.forEach(place => createMarker(place));
+                          }
+                      })
+                      .catch(err => {
+                          console.error('Error finding nearby clinics:', err);
+                          alert('Error: Unable to find nearby clinics');
+                      });
+                  });
+              } else {
+                  alert('Error: Your browser doesn\'t support geolocation.');
+              }
+          }
+          
+          // Placeholder for createMarker function (needs to be implemented)
+          function createMarker(place) {
+              //Implementation to create marker on map using place data.
+              console.log("Marker data:", place);
+          }</script>
+</body>
+</html>
